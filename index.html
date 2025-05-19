@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Download TikTok videos without watermark quickly and easily with SnapSaveTT.">
+    <meta name="keywords" content="TikTok downloader, download TikTok videos, TikTok videos without watermark">
+    <meta name="author" content="SnapSaveTT">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Download TikTok Videos Without Watermark - SnapSaveTT</title>
+</head>
+<body>
+    <header>
+        <h1>SnapSaveTT - Download TikTok Videos Without Watermark</h1>
+        <p>Save TikTok videos quickly and easily without a watermark.</p>
+    </header>
+
+    <main>
+        <section>
+            <h2>Fast & Easy TikTok Video Downloader</h2>
+            <p>Simple and efficient. Just paste the TikTok video link and click Download.</p>
+        </section>
+
+        <section id="linkarea">
+            <label for="textareaid">Paste the TikTok video link below:</label><br>
+            <textarea id="textareaid" cols="30" rows="1" placeholder="Paste the link here" maxlength="500"></textarea>
+            <div id="buttons">
+                <button id="pasteid">Paste</button>
+                <button id="downloadid">Download</button>
+            </div>
+            <div id="result"></div>
+        </section>
+    </main>
+
+    <script>
+        document.getElementById("pasteid").addEventListener("click", async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById("textareaid").value = text;
+            } catch (err) {
+                alert("Failed to read clipboard.");
+            }
+        });
+
+        document.getElementById("downloadid").addEventListener("click", async () => {
+            const url = document.getElementById("textareaid").value.trim();
+            if (!url) {
+                alert("Please paste a TikTok video link.");
+                return;
+            }
+
+            try {
+                const response = await fetch("http://localhost:3000/api/download", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await response.json();
+
+                if (data.video) {
+                    const link = document.createElement("a");
+                    link.href = data.video;
+                    link.download = "tiktok_video.mp4";
+                    link.target = "_blank";
+                    link.click();
+
+                    document.getElementById("result").innerHTML = `<p><a href="${data.video}" target="_blank"></a></p>`;
+                } else {
+                    alert("Failed to get the video. Try another link.");
+                }
+            } catch (err) {
+                alert("Error contacting server.");
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>
